@@ -1,0 +1,102 @@
+
+# Task 1: Load and Explore the Dataset
+
+# Choose a dataset (Sales dataset in CSV format)
+# Assuming you have a CSV file named 'sales_data.csv' in the same directory.
+# If not, replace 'sales_data.csv' with the correct path to your file.
+try:
+    sales_data = pd.read_csv('sales_data.csv')
+except FileNotFoundError:
+    print("Error: sales_data.csv not found.  Please ensure the file is in the same directory or specify the correct path.")
+    # Create a dummy dataset for demonstration purposes in case the file is not found
+    data = {'Date': ['2023-01-01', '2023-01-01', '2023-01-02', '2023-01-02', '2023-01-03', '2023-01-03'],
+            'Region': ['North', 'South', 'North', 'South', 'North', 'South'],
+            'Product': ['A', 'B', 'A', 'B', 'A', 'B'],
+            'Sales': [100, 150, 120, None, 130, 160],
+            'Profit': [10, 15, 12, 14, 13, None]}
+    sales_data = pd.DataFrame(data)
+
+
+# Display the first few rows of the dataset
+print("First few rows of the dataset:\n", sales_data.head())
+
+# Explore the structure of the dataset
+print("\nData types:\n", sales_data.dtypes)
+print("\nMissing values:\n", sales_data.isnull().sum())
+
+# Clean the dataset (handle missing values)
+# Option 1: Fill missing values with the mean/median (for numerical columns)
+sales_data['Sales'].fillna(sales_data['Sales'].mean(), inplace=True)
+sales_data['Profit'].fillna(sales_data['Profit'].mean(), inplace=True)
+
+# Option 2: Drop rows with missing values (if appropriate)
+# sales_data.dropna(inplace=True)
+
+print("\nMissing values after cleaning:\n", sales_data.isnull().sum())
+
+
+# Task 2: Basic Data Analysis
+
+# Compute basic statistics of numerical columns
+print("\nBasic statistics:\n", sales_data.describe())
+
+# Perform groupings and compute the mean of a numerical column
+region_sales = sales_data.groupby('Region')['Sales'].mean()
+print("\nAverage sales per region:\n", region_sales)
+
+product_profit = sales_data.groupby('Product')['Profit'].mean()
+print("\nAverage profit per product:\n", product_profit)
+
+#Identify any patterns or interesting findings (example)
+#Based on example sales_data, North region is performing worse than South. Product B is more profitable than Product A.
+
+# Task 3: Data Visualization
+
+# Line chart (Sales trend over time)
+# Convert 'Date' column to datetime objects
+try:
+    sales_data['Date'] = pd.to_datetime(sales_data['Date'])
+except:
+    pass
+
+sales_trend = sales_data.groupby('Date')['Sales'].sum()
+plt.figure(figsize=(10, 6))
+plt.plot(sales_trend.index, sales_trend.values, marker='o')
+plt.title('Sales Trend Over Time')
+plt.xlabel('Date')
+plt.ylabel('Total Sales')
+plt.grid(True)
+plt.xticks(rotation=45)
+plt.tight_layout()  # Adjust layout to prevent labels from overlapping
+plt.show()
+
+# Bar chart (Comparison of average sales across regions)
+plt.figure(figsize=(8, 6))
+plt.bar(region_sales.index, region_sales.values)
+plt.title('Average Sales per Region')
+plt.xlabel('Region')
+plt.ylabel('Average Sales')
+plt.xticks(rotation=0) # No need to rotate labels here
+plt.tight_layout()
+plt.show()
+
+
+# Histogram (Distribution of Sales)
+plt.figure(figsize=(8, 6))
+plt.hist(sales_data['Sales'], bins=5, color='skyblue', edgecolor='black')
+plt.title('Distribution of Sales')
+plt.xlabel('Sales')
+plt.ylabel('Frequency')
+plt.tight_layout()
+plt.show()
+
+
+# Scatter plot (Relationship between Sales and Profit)
+plt.figure(figsize=(8, 6))
+plt.scatter(sales_data['Sales'], sales_data['Profit'], color='green', alpha=0.7) # alpha for transparency
+plt.title('Relationship between Sales and Profit')
+plt.xlabel('Sales')
+plt.ylabel('Profit')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
